@@ -24,12 +24,15 @@ export default class UpdateUserAvatarService {
         private storageProvider: IStorageProvider
     ) {}
 
-    public async execute ({ user_id, avatarFileName }: IRequest): Promise<User> {
+    public async execute ({ user_id, avatarFileName }: IRequest
+    ): Promise<User> {
 
         const user = await this.usersRepository.findById(user_id);
 
         if (!user) {
-            throw new AppError('Ops, este acesso é somente para usuários autenticados!', 401);
+            throw new AppError(
+                'Ops, este acesso é somente para usuários autenticados!', 401
+            );
         }
 
         if (user.avatar) {
