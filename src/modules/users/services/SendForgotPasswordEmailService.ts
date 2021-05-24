@@ -29,7 +29,9 @@ export default class SendForgotPasswordEmailService {
             const user = await this.usersRepository.findByEmail(email);
 
         if (!user) {
-            throw new AppError('Ops, o usuário não existe em nossa base de dados!');
+            throw new AppError(
+                'Ops, o usuário não existe em nossa base de dados!'
+            );
         }
 
         const { token } = await this.userTokensRepository.generate(user.id);
@@ -51,7 +53,9 @@ export default class SendForgotPasswordEmailService {
                 file: forgotPasswordTemplate,
                 variables: {
                     name: user.name,
-                    link: `http://localhost:3000/reset_password?token=${token}`,
+                    link: `
+                        ${process.env.APP_WEB_URL}/reset_password?token=${token}
+                    `,
                 },
             },
         });
