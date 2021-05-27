@@ -1,10 +1,13 @@
 import { startOfHour, isBefore, getHours, format } from 'date-fns';
 import { injectable, inject } from 'tsyringe';
+import ptBR from 'date-fns/locale/pt-BR';
 
 import AppError from '@shared/errors/AppError';
 import Appointment from '../infra/typeorm/entities/Appointment';
 import IAppointmentsRepository from '../repositories/IAppointmentsRepository';
 import INotificationsRepository from '@modules/notifications/repositories/INotificationsRepository';
+import ICacheProvider from '@shared/container/providers/CacheProvider/models/ICacheProvider';
+import CreateNotificationService from '@modules/notifications/services/CreateNotificationService';
 
 interface IRequest {
     provider_id: string;
@@ -20,7 +23,10 @@ export default class CreateAppointmentService {
         private appointmentsRepository: IAppointmentsRepository,
 
         @inject('NotificationsRepository')
-        private notificationsRepository: INotificationsRepository
+        private notificationsRepository: INotificationsRepository,
+
+        @inject('CacheProvider')
+        private cacheProvider: ICacheProvider
     ) {}
 
     public async execute({ date, provider_id, user_id }: IRequest):
@@ -64,6 +70,28 @@ export default class CreateAppointmentService {
             recipient_id: provider_id,
             content: `Novo agendamento para o dia ${dateFormatted}`
         });
+
+        const createNotification = container.resolve(CreateNotificationService);
+
+        const user = await appointment.user;
+
+        const appointmentDateFormatted = format(
+            appointmentDate,
+            "dd 'de' MMMM 'às' HH:mm'horas'",
+            { locale: ptBR }
+        );
+
+        await createNotification.execute({
+            recipient_id: provider_id,
+            content: `Novo agendamento com ${user.name}, dia ${appointmentDateFormatted}`
+        });
+
+        await this.cacheProvider.invalidate(
+            `provider-appointments:${provider_id}:${format(
+                appointmentDate,
+                'yyyy-M-d'
+            )}`
+        );
         
         return appointment;
     }
