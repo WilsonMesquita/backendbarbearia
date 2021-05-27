@@ -54,7 +54,7 @@ export default class SendForgotPasswordEmailService {
                 variables: {
                     name: user.name,
                     link: `
-                        ${process.env.APP_WEB_URL}/reset_password?token=${token}
+                        ${process.env.APP_WEB_URL}/reset-password?token=${token}
                     `,
                 },
             },
