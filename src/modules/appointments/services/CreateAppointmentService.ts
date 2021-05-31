@@ -74,20 +74,20 @@ export default class CreateAppointmentService {
             content: `Novo agendamento para o dia ${dateFormatted}`
         });
 
-        const createNotification = container.resolve(CreateNotificationService);
+        // const createNotification = container.resolve(CreateNotificationService);
 
-        const user = await appointment.user;
+        // const user = await appointment.user;
 
-        const appointmentDateFormatted = format(
-            appointmentDate,
-            "dd 'de' MMMM 'às' HH:mm'horas'",
-            { locale: ptBR }
-        );
+        // const appointmentDateFormatted = format(
+        //     appointmentDate,
+        //     "dd 'de' MMMM 'às' HH:mm'horas'",
+        //     { locale: ptBR }
+        // );
 
-        await createNotification.execute({
-            recipient_id: provider_id,
-            content: `Novo agendamento com ${user.name}, dia ${appointmentDateFormatted}`
-        });
+        // await createNotification.execute({
+        //     recipient_id: provider_id,
+        //     content: `Novo agendamento com ${user.name}, dia ${appointmentDateFormatted}`
+        // });
 
         await this.cacheProvider.invalidate(
             `provider-appointments:${provider_id}:${format(
