@@ -27,27 +27,23 @@ export default class UpdateProfileServide {
     user_id,
     name,
     email,
-    old_password,
-    password
+    password,
+    old_password
   }: IRequest): Promise<User> {
     const user = await this.usersRepository.findById(user_id);
     if (!user) {
-      throw new AppError('Ops, usuário não encontrado!', 401);
+      throw new AppError('Ops, usuário não encontrado!');
     }
 
-    const userWithUpdateEmail = await this.usersRepository.findByEmail(email);
+    const checkEmail = await this.usersRepository.findByEmail(email);
 
-    if (userWithUpdateEmail && userWithUpdateEmail.id != user.id) {
-      throw new AppError('Ops, e-mail em uso!', 401);
+    if (checkEmail && checkEmail.id !== user.id) {
+      throw new AppError('Ops, e-mail em uso!');
     }
     
-    user.name = name;
-    user.email = email;
-
     if (password && !old_password) {
       throw new AppError(
-        'Ops, você precisa informar a senha antiga para definir uma nova senha!',
-        401
+        'Ops, você precisa informar a senha antiga para definir uma nova senha!'
       );
     }
 
@@ -57,15 +53,17 @@ export default class UpdateProfileServide {
         password
       );
 
-      if (!checkOldPassword) {
-        throw new AppError(
-          'Ops, a senha antiga não confere!',
-          401
-        );
-      }
+      // if (!checkOldPassword) {
+      //   throw new AppError(
+      //     'Ops, a senha antiga não confere!'
+      //   );
+      // }
 
       user.password = await this.hashProvider.generateHash(password);
     }
+
+    user.name = name;
+    user.email = email;
 
     return this.usersRepository.save(user);
   }
