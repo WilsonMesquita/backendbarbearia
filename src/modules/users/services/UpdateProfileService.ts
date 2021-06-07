@@ -5,7 +5,7 @@ import IHashProvider from '../providers/HashProvider/models/IHashProvider';
 import User from '../infra/typeorm/entities/User';
 import AppError from '@shared/errors/AppError';
 
-interface IRequest {
+interface IRequestDTO {
   user_id: string;
   name: string,
   email: string;
@@ -29,7 +29,7 @@ export default class UpdateProfileServide {
     email,
     password,
     old_password
-  }: IRequest): Promise<User> {
+  }: IRequestDTO): Promise<User> {
     const user = await this.usersRepository.findById(user_id);
     if (!user) {
       throw new AppError('Ops, usuário não encontrado!');
@@ -53,11 +53,9 @@ export default class UpdateProfileServide {
         password
       );
 
-      // if (!checkOldPassword) {
-      //   throw new AppError(
-      //     'Ops, a senha antiga não confere!'
-      //   );
-      // }
+      if (!checkOldPassword) {
+        throw new AppError('Ops, a senha antiga não confere!');
+      }
 
       user.password = await this.hashProvider.generateHash(password);
     }

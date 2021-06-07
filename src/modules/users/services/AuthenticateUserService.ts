@@ -7,7 +7,7 @@ import AppError from '@shared/errors/AppError';
 import IUsersRepository from '../repositories/IUsersRepository';
 import IHashProvider from '../providers/HashProvider/models/IHashProvider';
 
-interface IRequest {
+interface IRequestDTO {
     email: string;
     password: string;
 }
@@ -28,8 +28,7 @@ export default class AuthenticateUserService {
         private hashProvider: IHashProvider
     ) {}
     
-    public async execute ({ email, password }: IRequest): Promise<IResponse> {
-
+    public async execute ({ email, password }: IRequestDTO): Promise<IResponse> {
         const user = await this.usersRepository.findByEmail(email);
 
         if (!user) {
